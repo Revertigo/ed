@@ -5,24 +5,24 @@
 #include "Document.hpp"
 using namespace std;
 
-Document::Document(string file): Document()
+Document::Document(const string file): Document()
 {
     _file = file;
     ifstream is(_file);
 
     if(!is){
-        cout << "File doesn't exists." << endl;
+        cout << _file << ": No such file or directory" << endl;
         return;
     }
 
-    std::string line;
-    while (std::getline(is, line))
+    //Copy the file's content into a vector
+    string line;
+    while (getline(is, line))
     {
         _lines.push_back(line);
     }
     set_last_line();
     //This function called automatically on ifstream dtor (when going out of scope)
-    is.close();
 }
 
 bool Document::document_open(void)
@@ -35,11 +35,17 @@ bool Document::write_mode(void)
     return _write_mode;
 }
 
-void Document::write_new_line(string line)
+void Document::write_new_line(const string line)
 {
-    _lines.insert(_lines.begin() + _current_line++, line);
+    if(_change_current){
+        _lines[_current_line-1] = line;
+        _change_current = false;
+    }
+    else{
+        _lines.insert(_lines.begin() + _current_line++, line);
+    }
 }
-string Document::set_current_line(int line_number)
+string Document::set_current_line(const int line_number)
 {
     string result = "?";
     if(line_number > 0 && line_number <= _lines.size()) {
@@ -49,9 +55,9 @@ string Document::set_current_line(int line_number)
 
     return result;
 }
-void Document::move_lines(int howmany)
+string Document::move_lines(const int howmany)
 {
-    _current_line += howmany;
+    return set_current_line(_current_line + howmany);
 }
 string Document::set_last_line()
 {
@@ -84,11 +90,12 @@ void Document::write_file()
     //In this case, the file name is already known, so we just call write_file(string)
     write_file(_file);
 }
-void Document::write_file(string file)
+void Document::write_file(const string file)
 {
-    std::ofstream output_file(file);
-    std::ostream_iterator<std::string> output_iterator(output_file, "\n");
-    std::copy(_lines.begin(), _lines.end(), output_iterator);
+    ofstream output_file(file);
+    ostream_iterator<string> output_iterator(output_file, "\n");
+    //Copy the vector into the file's iterator and flushing it in the end. close called automatically
+    copy(_lines.begin(), _lines.end(), output_iterator);
 }
 void Document::quit()
 {

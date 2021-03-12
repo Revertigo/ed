@@ -9,7 +9,7 @@ using namespace std;
 
 inline bool Editor::is_integer(const string & s)
 {
-    if(s.empty() || ((!isdigit(s[0])) && (s[0] != '-') && (s[0] != '+'))) return false;
+    if(s.empty() || ((!isdigit(s[0])))) return false;
 
     char * p;
     strtol(s.c_str(), &p, 10);
@@ -39,8 +39,31 @@ void Editor::loop(void)
             continue;
         }
 
+        //If write mode is enabled
+        while(_document.write_mode() && line != "."){
+            _document.write_new_line(line);
+            getline(cin, line);
+        }
+
         user_input = line[0]; //Get the first character
         switch (user_input) {
+            case '+':
+            case '-': {
+                if(is_integer(line.substr(1))) {
+                    string current_line = _document.move_lines(stoi(line));
+                    cout << current_line << endl;
+                    //Break only in case of success, otherwise go to default
+                    break;
+                }
+                goto default_case;
+            }
+
+            case '$': {
+                string current_line = _document.set_last_line();
+                cout << current_line << endl;
+                break;
+            }
+
             case 'a': {
                 _document.append_lines();
                 break;
@@ -64,34 +87,27 @@ void Editor::loop(void)
 
             case 'w': {
                 if ((_empty_ctor && line.size() == 1) ||
-                    //Second char should be space
-                    (_empty_ctor && line[1] != ' ')){
-                    cout << _undefined_operation << endl;
-                }
-                else if (_empty_ctor) {
+                //Second char should be space
+                if((line.size() > 2 && line[1] == ' ')) {
                     //Position 2 is the file name
                     string file = line.substr(2);
                     _document.write_file(file);
-                } else {
-                    //If cto's wasn't empty, file name is already known
+                    break;
+                }
+                else if(!_empty_ctor){
+                    //If ctor wasn't empty, file name is already known
                     _document.write_file();
+                    break;
                 }
 
-                break;
+                goto default_case;
             }
 
             case 'q': {
                 _document.quit();
                 break;
             }
-
-            case '+':
-            case '-': {
-                string number = line.substr(1);
-                _document.move_lines(stoi(number));
-                break;
-            }
-
+default_case:
             default: {
                 cout << _undefined_operation << endl;
                 break;

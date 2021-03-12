@@ -17,8 +17,9 @@ class Document {
     string _file;
     vector<string> _lines;
     bool _write_mode; //True for writing mode, false for control mode
-    bool _open; //Whether the document is open or not
-    int _current_line;
+    bool _open; //True if we should edit the current line
+
+    size_t _current_line;
 
 public:
     Document():_write_mode(false), _current_line(0), _open(true){}
@@ -29,8 +30,8 @@ public:
     void write_new_line(string line);
 
     //ed supported operations
-    string set_current_line(int line_number);                            //command=n (where n is line number)
-    void move_lines(int howmany);                       //command=+/-
+    string set_current_line(const int line_number);                            //command=n (where n is line number)
+    string move_lines(const int howmany);                       //command=+/-
     string set_last_line();                               //command=$
     void append_lines();                                //command=a
     void end_lines();                                   //command=.
@@ -41,7 +42,7 @@ public:
     void sed_replace(string old_text, string new_text); //command=s/old/new
     void join_lines();                                  //command=j
     void write_file();                                  //command=w
-    void write_file(string file);                       //command=w file
+    void write_file(const string file);                       //command=w file
     void quit();                                        //command=q
 };
 
