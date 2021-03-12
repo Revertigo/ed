@@ -78,8 +78,10 @@ void Editor::loop(void)
             }
 
             case 'd':{
-                _document.delete_line();
-                break;
+                if(line.length() == 1 && _document.delete_line()){
+                    break;
+                }
+                goto default_case;
             }
 
             case '/':{

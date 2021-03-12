@@ -39,7 +39,7 @@ public:
     void end_lines();                                   //command=.
     void insert_lines();                                //command=i
     void change_line();                                 //command=c
-    void delete_line();                                 //command=d
+    bool delete_line();                                 //command=d
     string sed_search(const string text);                       //command=/text/
     string sed_replace(const string old_text, const string new_text); //command=s/old/new
     bool join_lines();                                  //command=j

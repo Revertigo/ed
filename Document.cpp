@@ -85,14 +85,23 @@ void Document::change_line()
     _change_current = true;
     append_lines();
 }
-void Document::delete_line()
+
+bool Document::delete_line()
 {
-    //It's OK to erase strings event if the index is bigger then array size
-    _lines.erase(_lines.begin() + _current_line - 1);
-    //In case current line exceeds the array size
-    _current_line = min(_current_line, _lines.size());
+    bool result = false;
+    if(_current_line > 0) {
+        //It's OK to erase strings event if the index is bigger then array size
+        _lines.erase(_lines.begin() + _current_line - 1);
+        //In case current line exceeds the array size
+        _current_line = min(_current_line, _lines.size());
+
+        result = true;
+    }
+
+    return result;
 }
-string Document::sed_search(const string text)
+
+string Document::sed_search(const string & text)
 {
     size_t line_number = 0;
 
