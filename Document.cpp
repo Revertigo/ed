@@ -1,7 +1,7 @@
 //
 // Created by dekel on 3/9/21.
 //
-#include <sstream>
+#include <algorithm>
 #include "Document.hpp"
 using namespace std;
 
@@ -80,10 +80,44 @@ void Document::insert_lines()
     //Finally, append the file
     append_lines();
 }
-void Document::change_line(){}
-void Document::delete_line(){}
-void Document::sed_search(string text){}
-void Document::sed_replace(string old_text, string new_text){}
+void Document::change_line()
+{
+    _change_current = true;
+    append_lines();
+}
+void Document::delete_line()
+{
+    //It's OK to erase strings event if the index is bigger then array size
+    _lines.erase(_lines.begin() + _current_line - 1);
+    //In case current line exceeds the array size
+    _current_line = min(_current_line, _lines.size());
+}
+string Document::sed_search(const string text)
+{
+    size_t line_number = 0;
+
+    //First, search from current line till the end
+    for (auto it = begin (_lines) + _current_line; it != end (_lines); ++it) {
+        if(it->find(text) != std::string::npos){
+            line_number = it - _lines.begin() + 1;
+            break;
+        }
+    }
+
+    if(line_number == 0){
+        //Secondly, search from beginning till current line
+        for (auto it = begin (_lines); it != begin (_lines) + _current_line; ++it) {
+            if(it->find(text) != std::string::npos){
+                //plus 1 since we need to translate it to user lines
+                line_number = it - _lines.begin() + 1;
+                break;
+            }
+        }
+    }
+
+    return set_current_line(line_number);
+}
+void Document::sed_replace(const string old_text, const string new_text){}
 void Document::join_lines(){}
 void Document::write_file()
 {

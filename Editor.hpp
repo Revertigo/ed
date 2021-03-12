@@ -6,7 +6,6 @@
 #define ED_EDITOR_HPP
 
 #include <string>
-#include <fstream>
 
 #include "Document.hpp"
 
@@ -18,13 +17,12 @@ class Editor {
     Document _document;
     bool _empty_ctor;
 
-    inline bool is_integer(const std::string & s);
+    inline bool is_integer(const string & s);
 public:
     Editor(): _empty_ctor(true){}
     Editor(string file) : _document(file), _empty_ctor(false){}
+    virtual ~Editor(){}
 
-    virtual ~Editor(){
-    }
     void loop(void);
 };
 

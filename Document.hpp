@@ -16,18 +16,20 @@ using namespace std;
 class Document {
     string _file;
     vector<string> _lines;
-    bool _write_mode; //True for writing mode, false for control mode
-    bool _open; //True if we should edit the current line
 
-    size_t _current_line;
+    bool _open; //Whether the document is open or not
+    bool _write_mode; //True for writing mode, false for control mode
+    bool _change_current; //True if we should edit the current line
+
+    size_t _current_line;//Always between 1 and _lines.size inclusive
 
 public:
-    Document():_write_mode(false), _current_line(0), _open(true){}
-    Document(string file);
+    Document(): _open(true), _write_mode(false), _change_current(false), _current_line(0){}
+    Document(const string file);
 
     bool document_open(void);
     bool write_mode(void);
-    void write_new_line(string line);
+    void write_new_line(const string line);
 
     //ed supported operations
     string set_current_line(const int line_number);                            //command=n (where n is line number)
@@ -38,8 +40,8 @@ public:
     void insert_lines();                                //command=i
     void change_line();                                 //command=c
     void delete_line();                                 //command=d
-    void sed_search(string text);                       //command=/text/
-    void sed_replace(string old_text, string new_text); //command=s/old/new
+    string sed_search(const string text);                       //command=/text/
+    void sed_replace(const string old_text, const string new_text); //command=s/old/new
     void join_lines();                                  //command=j
     void write_file();                                  //command=w
     void write_file(const string file);                       //command=w file

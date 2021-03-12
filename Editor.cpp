@@ -1,7 +1,6 @@
 //
 // Created by dekel on 3/9/21.
 //
-
 #include <iostream>
 #include "Editor.hpp"
 
@@ -26,14 +25,7 @@ void Editor::loop(void)
     while(_document.document_open()) {
         getline(cin, line);
 
-        //If write mode enabled
-        while(_document.write_mode() && line != ".") {
-            _document.write_new_line(line);
-            getline(cin, line);
-        }
-
-        if(is_integer(line))
-        {
+        if(is_integer(line)){
             string current_line = _document.set_current_line(stoi(line));
             cout << current_line << endl;
             continue;
@@ -74,19 +66,31 @@ void Editor::loop(void)
                 break;
             }
 
-            case '$': {
-                string current_line = _document.set_last_line();
-                cout << current_line << endl;
-                break;
-            }
-
             case 'i': {
                 _document.insert_lines();
                 break;
             }
 
+            case 'c':{
+                _document.change_line();
+                break;
+            }
+
+            case 'd':{
+                _document.delete_line();
+                break;
+            }
+
+            case '/':{
+                //Validate the string ends with /
+                if(line[line.size()-1] == '/') {
+                    string current_line = _document.sed_search(line.substr(1, line.size() - 2));
+                    cout << current_line << endl;
+                    break;
+                }
+                goto default_case;
+            }
             case 'w': {
-                if ((_empty_ctor && line.size() == 1) ||
                 //Second char should be space
                 if((line.size() > 2 && line[1] == ' ')) {
                     //Position 2 is the file name
