@@ -117,8 +117,30 @@ string Document::sed_search(const string text)
 
     return set_current_line(line_number);
 }
-void Document::sed_replace(const string old_text, const string new_text){}
-void Document::join_lines(){}
+string Document::sed_replace(const string old_text, const string new_text)
+{
+    string result = "?";
+    size_t old_text_pos = _lines[_current_line - 1].find(old_text);
+
+    //Only if we found occurrence of old_text
+    if (old_text_pos != std::string::npos) {
+        _lines[_current_line - 1].replace(old_text_pos, old_text.length(), new_text);
+        result = _lines[_current_line - 1];
+    }
+
+    return result;
+}
+bool Document::join_lines()
+{
+    bool joined = false;
+    if((_current_line -1) < _lines.size() - 1){
+        _lines[_current_line-1] += _lines[_current_line];
+        _lines.erase(_lines.begin() + _current_line);
+        joined = true;
+    }
+
+    return joined;
+}
 void Document::write_file()
 {
     //In this case, the file name is already known, so we just call write_file(string)

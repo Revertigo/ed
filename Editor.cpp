@@ -2,6 +2,7 @@
 // Created by dekel on 3/9/21.
 //
 #include <iostream>
+#include <sstream>
 #include "Editor.hpp"
 
 using namespace std;
@@ -90,6 +91,31 @@ void Editor::loop(void)
                 }
                 goto default_case;
             }
+
+            case 's':{
+                if(line[1] == '/') {
+                    //Starting from char 2
+                    stringstream ss(line.substr(2));
+                    string old_text;
+                    string new_text;
+                    //Only if these two strings exists and not empty
+                    if (getline(ss, old_text, '/') && !old_text.empty() &&
+                        getline(ss, new_text, '/') && !new_text.empty()) {
+                        string current_line = _document.sed_replace(old_text, new_text);
+                        cout << current_line << endl;
+                        break;
+                    }
+                }
+                goto default_case;
+            }
+
+            case 'j':{
+                if(line.length() == 1 && _document.join_lines()){
+                    break;
+                }
+                goto default_case;
+            }
+
             case 'w': {
                 //Second char should be space
                 if((line.size() > 2 && line[1] == ' ')) {

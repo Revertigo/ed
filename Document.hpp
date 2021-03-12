@@ -41,8 +41,8 @@ public:
     void change_line();                                 //command=c
     void delete_line();                                 //command=d
     string sed_search(const string text);                       //command=/text/
-    void sed_replace(const string old_text, const string new_text); //command=s/old/new
-    void join_lines();                                  //command=j
+    string sed_replace(const string old_text, const string new_text); //command=s/old/new
+    bool join_lines();                                  //command=j
     void write_file();                                  //command=w
     void write_file(const string file);                       //command=w file
     void quit();                                        //command=q
