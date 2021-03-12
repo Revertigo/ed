@@ -1,21 +1,25 @@
 //
 // Created by dekel on 3/9/21.
 //
+#include <sstream>
 #include "Document.hpp"
 using namespace std;
 
-Document::Document(string file): Document(){
+Document::Document(string file): Document()
+{
     _file = file;
-    ifstream is(file);
-    istream_iterator<string> start(is), end;
-    vector<string> lines(start, end);
+    ifstream is(_file);
 
-    // print the lines to stdout
-    copy(lines.begin(), lines.end(),
-         ostream_iterator<string>(cout, " "));
-    cout << endl;
+    if(!is){
+        cout << "File doesn't exists." << endl;
+        return;
+    }
 
-    _lines = lines;//Move c'tor :)
+    std::string line;
+    while (std::getline(is, line))
+    {
+        _lines.push_back(line);
+    }
     set_last_line();
     //This function called automatically on ifstream dtor (when going out of scope)
     is.close();
