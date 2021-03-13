@@ -4,6 +4,7 @@
 #include <fstream>
 #include <iterator>
 #include "Document.hpp"
+
 using namespace std;
 
 Document::Document(const string file): Document()
@@ -18,12 +19,12 @@ Document::Document(const string file): Document()
 
     //Copy the file's content into a vector
     string line;
-    while (getline(is, line))
-    {
+    while (getline(is, line)){
         _lines.push_back(line);
     }
+
     set_last_line();
-    //This function called automatically on ifstream dtor (when going out of scope)
+    //is.close() function called automatically on ifstream dtor (when going out of scope)
 }
 
 bool Document::document_open(void)
@@ -36,17 +37,19 @@ bool Document::write_mode(void)
     return _write_mode;
 }
 
-void Document::write_new_line(const string line)
+void Document::write_new_line(const string & line)
 {
+    //Only in case we need to also change the current line
     if(_change_current){
-        _lines[_current_line-1] = line;
+        _lines[_current_line - 1] = line;
         _change_current = false;
     }
     else{
         _lines.insert(_lines.begin() + _current_line++, line);
     }
 }
-string Document::set_current_line(const int line_number)
+
+string Document::set_current_line(const int & line_number)
 {
     string result = "?";
     if(line_number > 0 && line_number <= _lines.size()) {
@@ -56,26 +59,30 @@ string Document::set_current_line(const int line_number)
 
     return result;
 }
-string Document::move_lines(const int howmany)
+
+string Document::move_lines(const int & howmany)
 {
     return set_current_line(_current_line + howmany);
 }
+
 string Document::set_last_line()
 {
     return set_current_line(_lines.size());
 }
+
 void Document::append_lines()
 {
     _write_mode = true;
 }
+
 void Document::end_lines()
 {
     _write_mode = false;
 }
+
 void Document::insert_lines()
 {
-    if(_current_line > 0)
-    {
+    if(_current_line > 0){
         _current_line--;
     }
     //Finally, append the file
@@ -102,7 +109,6 @@ bool Document::delete_line()
         _lines.erase(_lines.begin() + _current_line - 1);
         //In case current line exceeds the array size
         _current_line = min(_current_line, _lines.size());
-
         result = true;
     }
 
@@ -134,7 +140,8 @@ string Document::sed_search(const string & text)
 
     return set_current_line(line_number);
 }
-string Document::sed_replace(const string old_text, const string new_text)
+
+string Document::sed_replace(const string & old_text, const string & new_text)
 {
     string result = "?";
     size_t old_text_pos = _lines[_current_line - 1].find(old_text);
@@ -147,6 +154,7 @@ string Document::sed_replace(const string old_text, const string new_text)
 
     return result;
 }
+
 bool Document::join_lines()
 {
     bool joined = false;
@@ -158,18 +166,21 @@ bool Document::join_lines()
 
     return joined;
 }
+
 void Document::write_file()
 {
     //In this case, the file name is already known, so we just call write_file(string)
     write_file(_file);
 }
-void Document::write_file(const string file)
+
+void Document::write_file(const string & file)
 {
     ofstream output_file(file);
     ostream_iterator<string> output_iterator(output_file, "\n");
     //Copy the vector into the file's iterator and flushing it in the end. close called automatically
     copy(_lines.begin(), _lines.end(), output_iterator);
 }
+
 void Document::quit()
 {
     _open = false;

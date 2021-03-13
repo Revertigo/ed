@@ -9,7 +9,9 @@ using namespace std;
 
 inline bool Editor::is_integer(const string & s)
 {
-    if(s.empty() || ((!isdigit(s[0])))) return false;
+    if(s.empty() || ((!isdigit(s[0])))) {
+        return false;
+    }
 
     char * p;
     strtol(s.c_str(), &p, 10);
@@ -119,9 +121,9 @@ void Editor::loop(void)
                     stringstream ss(line.substr(2));
                     string old_text;
                     string new_text;
-                    //Only if these two strings exists and not empty
+                    //Only if these two strings exists and first string not empty
                     if (getline(ss, old_text, '/') && !old_text.empty() &&
-                        getline(ss, new_text, '/') && !new_text.empty()) {
+                        getline(ss, new_text, '/')) {
                         string current_line = _document.sed_replace(old_text, new_text);
                         cout << current_line << endl;
                         break;
@@ -150,7 +152,6 @@ void Editor::loop(void)
                     _document.write_file();
                     break;
                 }
-
                 goto default_case;
             }
 
