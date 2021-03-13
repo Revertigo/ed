@@ -26,12 +26,6 @@ void Editor::loop(void)
     while(_document.document_open()) {
         getline(cin, line);
 
-        if(is_integer(line)){
-            string current_line = _document.set_current_line(stoi(line));
-            cout << current_line << endl;
-            continue;
-        }
-
         //If write mode is enabled
         while(_document.write_mode() && line != "."){
             _document.write_new_line(line);
@@ -40,6 +34,15 @@ void Editor::loop(void)
 
         user_input = line[0]; //Get the first character
         switch (user_input) {
+            case '1' ... '9':{
+                if(is_integer(line)) {
+                    string current_line = _document.set_current_line(stoi(line));
+                    cout << current_line << endl;
+                    break;
+                }
+                goto default_case;
+            }
+
             case '+':
             case '-': {
                 if(is_integer(line.substr(1))) {
