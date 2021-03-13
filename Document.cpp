@@ -1,7 +1,8 @@
 //
 // Created by dekel on 3/9/21.
 //
-#include <algorithm>
+#include <fstream>
+#include <iterator>
 #include "Document.hpp"
 using namespace std;
 
