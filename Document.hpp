@@ -36,7 +36,7 @@ public:
     void append_lines();                                //command=a
     void end_lines();                                   //command=.
     void insert_lines();                                //command=i
-    void change_line();                                 //command=c
+    bool change_line();                                 //command=c
     bool delete_line();                                 //command=d
     string sed_search(const string text);                       //command=/text/
     string sed_replace(const string old_text, const string new_text); //command=s/old/new

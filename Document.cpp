@@ -81,10 +81,17 @@ void Document::insert_lines()
     //Finally, append the file
     append_lines();
 }
-void Document::change_line()
+
+bool Document::change_line()
 {
-    _change_current = true;
-    append_lines();
+    bool result = false;
+    if(_current_line > 0){
+        _change_current = true;
+        append_lines();
+        result = true;
+    }
+
+    return result;
 }
 
 bool Document::delete_line()

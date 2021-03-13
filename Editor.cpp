@@ -55,29 +55,44 @@ void Editor::loop(void)
             }
 
             case '$': {
-                string current_line = _document.set_last_line();
-                cout << current_line << endl;
-                break;
+                if(line.length() == 1) {
+                    string current_line = _document.set_last_line();
+                    cout << current_line << endl;
+                    break;
+                }
+                goto default_case;
             }
 
             case 'a': {
-                _document.append_lines();
-                break;
+                if(line.length() == 1) {
+                    _document.append_lines();
+                    break;
+                }
+                goto default_case;
             }
 
             case '.': {
-                _document.end_lines();
-                break;
+                if(line.length() == 1) {
+                    _document.end_lines();
+                    break;
+                }
+                goto default_case;
             }
 
             case 'i': {
-                _document.insert_lines();
-                break;
+                if(line.length() == 1) {
+                    _document.insert_lines();
+                    break;
+                }
+                goto default_case;
             }
 
             case 'c':{
-                _document.change_line();
-                break;
+                if(line.length() == 1 && _document.change_line()) {
+                    _document.change_line();
+                    break;
+                }
+                goto default_case;
             }
 
             case 'd':{
@@ -88,9 +103,10 @@ void Editor::loop(void)
             }
 
             case '/':{
-                //Validate the string ends with /
-                if(line[line.size()-1] == '/') {
-                    string current_line = _document.sed_search(line.substr(1, line.size() - 2));
+                string to_search;
+                stringstream ss(line.substr(1));
+                if(getline(ss, to_search, '/') && !to_search.empty()) {
+                    string current_line = _document.sed_search(to_search);
                     cout << current_line << endl;
                     break;
                 }
@@ -123,13 +139,13 @@ void Editor::loop(void)
 
             case 'w': {
                 //Second char should be space
-                if((line.size() > 2 && line[1] == ' ')) {
+                if((line.length() > 2 && line[1] == ' ')) {
                     //Position 2 is the file name
                     string file = line.substr(2);
                     _document.write_file(file);
                     break;
                 }
-                else if(!_empty_ctor){
+                else if(!_empty_ctor && line.length() == 1){
                     //If ctor wasn't empty, file name is already known
                     _document.write_file();
                     break;
@@ -139,8 +155,12 @@ void Editor::loop(void)
             }
 
             case 'q': {
-                _document.quit();
-                break;
+                if(line.length() == 1) {
+                    _document.quit();
+                    break;
+                }
+                goto default_case;
+
             }
 default_case:
             default: {
