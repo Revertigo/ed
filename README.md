@@ -26,5 +26,8 @@ This project is a partial implementation for one of the first editors developed 
 
 ## Installation
 ```
+mkdir build
+cd build
+cmake ..
 make
 ```
