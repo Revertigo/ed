@@ -25,4 +25,6 @@ This project is a partial implementation for one of the first editors developed 
 - q  
 
 ## Installation
+```
 make
+```
