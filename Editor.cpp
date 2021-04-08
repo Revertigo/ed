@@ -90,7 +90,7 @@ void Editor::loop(void)
             }
 
             case 'c':{
-                if(line.length() == 1 && _document.change_line()) {
+                if(line.length() == 1) {
                     _document.change_line();
                     break;
                 }
