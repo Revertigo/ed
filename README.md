@@ -5,8 +5,6 @@
           |  __| / _` |  
           | |___| (_| |  
           |______\__,_|  
- 
-# ed  
 ![build-passing](https://img.shields.io/badge/build-passing-brightgreen)  
 ## Introduction
 This project is a partial implementation for one of the first editors developed in Unix. It supports the following operations:
@@ -26,5 +24,8 @@ This project is a partial implementation for one of the first editors developed 
 
 ## Installation
 ```
+mkdir build
+cd build
+cmake ..
 make
 ```
