@@ -3,6 +3,7 @@
 //
 #include <fstream>
 #include <iterator>
+#include <regex>
 #include "Document.hpp"
 
 using namespace std;
@@ -118,10 +119,12 @@ bool Document::delete_line()
 string Document::sed_search(const string & text)
 {
     size_t line_number = 0;
+    //Search every substring of text in the line
+    regex pattern("(.*)" + text + "(.*)"); 
 
     //First, search from current line till the end
     for (auto it = begin (_lines) + _current_line; it != end (_lines); ++it) {
-        if(it->find(text) != std::string::npos){
+        if(regex_match(*it, pattern)){
             line_number = it - _lines.begin() + 1;
             break;
         }
@@ -130,7 +133,7 @@ string Document::sed_search(const string & text)
     if(line_number == 0){
         //Secondly, search from beginning till current line
         for (auto it = begin (_lines); it != begin (_lines) + _current_line; ++it) {
-            if(it->find(text) != std::string::npos){
+            if(regex_match(*it, pattern)){
                 //plus 1 since we need to translate it to user lines
                 line_number = it - _lines.begin() + 1;
                 break;
@@ -144,13 +147,11 @@ string Document::sed_search(const string & text)
 string Document::sed_replace(const string & old_text, const string & new_text)
 {
     string result = "?";
-    size_t old_text_pos = _lines[_current_line - 1].find(old_text);
-
-    //Only if we found occurrence of old_text
-    if (old_text_pos != std::string::npos) {
-        _lines[_current_line - 1].replace(old_text_pos, old_text.length(), new_text);
-        result = _lines[_current_line - 1];
-    }
+    regex pattern(old_text);
+    //Temp uses in order to later overwrite the new value
+    string temp = regex_replace(_lines[_current_line - 1], pattern, new_text);
+    result = (temp == _lines[_current_line - 1]) ? result : temp;
+    _lines[_current_line - 1] = temp; //regex doesn't overwrite the input line
 
     return result;
 }
