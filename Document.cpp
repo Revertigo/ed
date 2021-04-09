@@ -149,7 +149,8 @@ string Document::sed_replace(const string & old_text, const string & new_text)
     string result = "?";
     regex pattern(old_text);
     //Temp uses as placeholder in order to later overwrite the new value
-    string temp = regex_replace(_lines[_current_line - 1], pattern, new_text);
+    string temp = regex_replace(_lines[_current_line - 1], pattern, new_text, 
+                                regex_constants::format_first_only);
     result = (temp == _lines[_current_line - 1]) ? result : temp;
     _lines[_current_line - 1] = temp; //regex doesn't overwrite the input line
 
