@@ -3,27 +3,23 @@
 //
 #include <iostream>
 #include <sstream>
+#include <regex>
 #include "Editor.hpp"
 
 using namespace std;
-
-inline bool Editor::is_integer(const string & s)
-{
-    if(s.empty() || ((!isdigit(s[0])))) {
-        return false;
-    }
-
-    char * p;
-    strtol(s.c_str(), &p, 10);
-
-    return (*p == 0);
-}
 
 void Editor::loop(void)
 {
     //Main loop
     string line;
-    char user_input;
+
+    //Regex patterns
+    regex number("[0-9]+");
+    regex sign_number("(\\+|-)[0-9]+");
+    regex search_pattern("/([^/]+)/?"); //slash then anything that isn't slash (at least once) then 0 or one slash
+    regex replace_pattern("s/([^/]*)/([^/]*)/?");
+    regex single_char("(\\$|a|\\.|i|c|d|j|w|q)");
+    regex write_new_file("w [\\w,-]+(\\.[A-Za-z]+)?");
 
     while(_document.document_open()) {
         getline(cin, line);
@@ -34,140 +30,108 @@ void Editor::loop(void)
             getline(cin, line);
         }
 
-        user_input = line[0]; //Get the first character
-        switch (user_input) {
-            case '1' ... '9':{
-                if(is_integer(line)) {
-                    string current_line = _document.set_current_line(stoi(line));
-                    cout << current_line << endl;
-                    break;
-                }
-                goto default_case;
+        if(regex_match(line, number)){
+             try{
+                string current_line = _document.set_current_line(stoi(line));
+                cout << current_line << endl;
+            }catch(const out_of_range& e){
+                goto default_operation;
             }
-
-            case '+':
-            case '-': {
-                if(is_integer(line.substr(1))) {
-                    string current_line = _document.move_lines(stoi(line));
-                    cout << current_line << endl;
-                    //Break only in case of success, otherwise go to default
-                    break;
-                }
-                goto default_case;
+        }
+        else if(regex_match(line, sign_number)){
+            try{
+                string current_line = _document.move_lines(stoi(line));
+                cout << current_line << endl;
+            }catch(const out_of_range& e){
+                goto default_operation;
             }
+        }
+        else if(regex_match(line, search_pattern)){
+            string to_search;
+            stringstream ss(line.substr(1));
+            getline(ss, to_search, '/');
+            string current_line = _document.sed_search(to_search);
+            cout << current_line << endl;
+        }
+        else if(regex_match(line, replace_pattern)){
+            //Starting from char 2
+            stringstream ss(line.substr(2));
+            string old_text;
+            string new_text;
 
-            case '$': {
-                if(line.length() == 1) {
+            //Read text to old and new text from stream
+            getline(ss, old_text, '/');
+            getline(ss, new_text, '/');
+
+            string current_line = _document.sed_replace(old_text, new_text);
+            cout << current_line << endl;
+        }
+        else if(regex_match(line, single_char)){
+            switch (line[0]){
+                case '$': {
                     string current_line = _document.set_last_line();
                     cout << current_line << endl;
                     break;
                 }
-                goto default_case;
-            }
 
-            case 'a': {
-                if(line.length() == 1) {
+                case 'a': {
                     _document.append_lines();
                     break;
                 }
-                goto default_case;
-            }
 
-            case '.': {
-                if(line.length() == 1) {
+                case '.': {
                     _document.end_lines();
                     break;
                 }
-                goto default_case;
-            }
 
-            case 'i': {
-                if(line.length() == 1) {
+                case 'i': {
                     _document.insert_lines();
                     break;
                 }
-                goto default_case;
-            }
 
-            case 'c':{
-                if(line.length() == 1) {
-                    _document.change_line();
-                    break;
-                }
-                goto default_case;
-            }
-
-            case 'd':{
-                if(line.length() == 1 && _document.delete_line()){
-                    break;
-                }
-                goto default_case;
-            }
-
-            case '/':{
-                string to_search;
-                stringstream ss(line.substr(1));
-                if(getline(ss, to_search, '/') && !to_search.empty()) {
-                    string current_line = _document.sed_search(to_search);
-                    cout << current_line << endl;
-                    break;
-                }
-                goto default_case;
-            }
-
-            case 's':{
-                if(line[1] == '/') {
-                    //Starting from char 2
-                    stringstream ss(line.substr(2));
-                    string old_text;
-                    string new_text;
-                    //Only if these two strings exists and first string not empty
-                    if (getline(ss, old_text, '/') && !old_text.empty() &&
-                        getline(ss, new_text, '/')) {
-                        string current_line = _document.sed_replace(old_text, new_text);
-                        cout << current_line << endl;
+                case 'c':{
+                    if(_document.change_line()){
                         break;
                     }
+                    goto default_operation;
                 }
-                goto default_case;
-            }
 
-            case 'j':{
-                if(line.length() == 1 && _document.join_lines()){
-                    break;
+                case 'd':{
+                    if(_document.delete_line()){
+                        break;
+                    }
+                    goto default_operation;
                 }
-                goto default_case;
-            }
 
-            case 'w': {
-                //Second char should be space
-                if((line.length() > 2 && line[1] == ' ')) {
-                    //Position 2 is the file name
-                    string file = line.substr(2);
-                    _document.write_file(file);
-                    break;
+                case 'j':{
+                    if(_document.join_lines()){
+                        break;
+                    }
+                    goto default_operation;
                 }
-                else if(!_empty_ctor && line.length() == 1){
-                    //If ctor wasn't empty, file name is already known
-                    _document.write_file();
-                    break;
-                }
-                goto default_case;
-            }
 
-            case 'q': {
-                if(line.length() == 1) {
+                case 'w':{
+                    if(!_empty_ctor){
+                        //If ctor wasn't empty, file name is already known
+                        _document.write_file();
+                        break;
+                    }
+                    goto default_operation;
+                }
+
+                case 'q': {
                     _document.quit();
                     break;
                 }
-                goto default_case;
-
             }
-default_case:
-            default: {
-                cout << _undefined_operation << endl;
-                break;
-            }
+        }
+        else if(regex_match(line, write_new_file)){
+            string file = line.substr(2);
+            _document.write_file(file);
+        }
+        else{
+default_operation:
+            cout << _undefined_operation << endl;
         }
     }
 }
