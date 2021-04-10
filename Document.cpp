@@ -40,14 +40,7 @@ bool Document::write_mode(void)
 
 void Document::write_new_line(const string & line)
 {
-    //Only in case we need to also change the current line
-    if(_change_current){
-        _lines[_current_line - 1] = line;
-        _change_current = false;
-    }
-    else{
-        _lines.insert(_lines.begin() + _current_line++, line);
-    }
+    _lines.insert(_lines.begin() + _current_line++, line);
 }
 
 string Document::set_current_line(const int & line_number)
@@ -93,9 +86,17 @@ void Document::insert_lines()
 bool Document::change_line()
 {
     bool result = false;
-    if(_current_line > 0){
-        _change_current = true;
-        append_lines();
+
+    size_t old_current = _current_line;
+    if(delete_line()){
+        //means current line now points to the last line at the file
+        if(_current_line != old_current){
+            append_lines();
+        }
+        else{
+            insert_lines();
+        }
+        
         result = true;
     }
 

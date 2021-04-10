@@ -17,12 +17,11 @@ class Document {
 
     bool _open; //Whether the document is open or not
     bool _write_mode; //True for writing mode, false for control mode
-    bool _change_current; //True if we should edit the current line
 
     size_t _current_line;//Always between 1 and _lines.size inclusive
 
 public:
-    Document(): _open(true), _write_mode(false), _change_current(false), _current_line(0){}
+    Document(): _open(true), _write_mode(false), _current_line(0){}
     Document(const string file);
 
     bool document_open(void);
