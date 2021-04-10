@@ -14,9 +14,9 @@ void Editor::loop(void)
     string line;
 
     //Regex patterns
-    regex number("[0-9]+");
-    regex sign_number("(\\+|-)[0-9]+");
-    regex search_pattern("/([^/]+)/?"); //slash then anything that isn't slash (at least once) then 0 or one slash
+    regex number("\\d+"); //At least one digit(\\d = [0-9])
+    regex sign_number("(\\+|-)\\d+");
+    regex search_pattern("/([^/]+)/?"); //slash, then anything that isn't slash (at least once) then 0 or one slash
     regex replace_pattern("s/([^/]*)/([^/]*)/?");
     regex single_char("(\\$|a|\\.|i|c|d|j|w|q)");
     regex write_new_file("w [\\w,-]+(\\.[A-Za-z]+)?");
