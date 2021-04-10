@@ -161,7 +161,7 @@ string Document::sed_replace(const string & old_text, const string & new_text)
 bool Document::join_lines()
 {
     bool joined = false;
-    if((_current_line -1) < _lines.size() - 1){
+    if(_current_line  < _lines.size()){
         _lines[_current_line-1] += _lines[_current_line];
         _lines.erase(_lines.begin() + _current_line);
         joined = true;
